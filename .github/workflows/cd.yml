@@ -37,17 +37,6 @@ jobs:
           ls -R api/build/staging-deploy || echo "❌ api staging-deploy missing"
           echo "🔍 root build/staging-deploy (merged)"
           ls -R build/staging-deploy || echo "❌ merged staging-deploy missing"
-      - name: Import GPG key
-        run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      - name: Configure GPG for JReleaser
-        run: |
-          echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback \
-          --export-secret-keys > ~/.gnupg/secring.gpg
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Release with JReleaser
