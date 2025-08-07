@@ -6,14 +6,12 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     id("org.sonarqube") version "6.2.0.5505"
     jacoco
-    `maven-publish`
-    signing
+    id("org.jreleaser") version "1.12.0"
 }
 
 object ProjectInfo {
-    val version = System.getenv("GH_RELEASE_TAG") ?: "1.0.0"
+    val version = System.getenv("JRELEASER_PROJECT_VERSION") ?: "1.0.0"
     const val group = "io.github.akashkansara"
-    const val artifact = "modak"
 }
 
 allprojects {
@@ -98,69 +96,4 @@ sonarqube {
 
 tasks.named("sonar") {
     dependsOn("jacocoRootReport")
-}
-
-// Publishing configuration
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            groupId = ProjectInfo.group
-            artifactId = ProjectInfo.artifact
-            version = ProjectInfo.version
-            pom {
-                name.set("Modak")
-                description.set("A Kotlin/Java library for auto-correcting data using annotations")
-                url.set("https://github.com/akash-kansara/modak")
-                licenses {
-                    license {
-                        name.set("The MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
-                        distribution.set("repo")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/akash-kansara/modak.git")
-                    developerConnection.set("scm:git:ssh://github.com/akash-kansara/modak.git")
-                    url.set("https://github.com/akash-kansara/modak")
-                }
-                developers {
-                    developer {
-                        id.set("akashkansara")
-                        name.set("Akash Kansara")
-                        email.set("akash-kansara@users.noreply.github.com")
-                    }
-                }
-            }
-        }
-    }
-    repositories {
-        if (System.getenv("OSSRH_USERNAME") != null && System.getenv("OSSRH_PASSWORD") != null) {
-            maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = System.getenv("OSSRH_USERNAME")
-                    password = System.getenv("OSSRH_PASSWORD")
-                }
-            }
-        }
-        mavenLocal()
-    }
-}
-
-signing {
-    val signingKey: String? = System.getenv("GPG_PRIVATE_KEY")
-    val signingPassword: String? = System.getenv("GPG_PASSPHRASE")
-    isRequired = signingKey != null && signingPassword != null
-    if (signingKey != null && signingPassword != null) {
-        useInMemoryPgpKeys(
-            signingKey,
-            signingPassword
-        )
-        afterEvaluate {
-            sign(publishing.publications["mavenJava"])
-        }
-    }
 }

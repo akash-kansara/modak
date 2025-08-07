@@ -1,4 +1,4 @@
-name: Publish to Maven Central
+name: Release
 on:
   push:
     tags:
@@ -7,20 +7,24 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: 17
-      - name: Set GH_RELEASE_TAG
-        run: echo "GH_RELEASE_TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-      - name: Publish to OSSRH
-        run: ./gradlew publish --no-daemon
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+      - name: Build JARs
+        run: ./gradlew clean build --no-daemon
+      - name: Download & Install JReleaser
+        run: curl -Ls https://git.io/install-jreleaser | bash
+      - name: Release with JReleaser
+        run: jreleaser full-release
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GH_RELEASE_TAG: ${{ env.GH_RELEASE_TAG }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}

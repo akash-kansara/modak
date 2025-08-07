@@ -1,21 +1,17 @@
 plugins {
     `maven-publish`
     jacoco
+    signing
+}
+
+base {
+    archivesName.set("modak-api")
 }
 
 dependencies {
     implementation(libs.jakarta.validation.api)
 
     testImplementation(libs.junit.jupiter)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            artifactId = "modak-api"
-        }
-    }
 }
 
 tasks.test {
@@ -29,4 +25,63 @@ tasks.jacocoTestReport {
         xml.required.set(true)
         html.required.set(true)
     }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "modak-api"
+            pom {
+                name.set("Modak API")
+                description.set("Kotlin/Java API module for Modak")
+                url.set("https://github.com/akash-kansara/modak")
+                licenses {
+                    license {
+                        name.set("The MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("akashkansara")
+                        name.set("Akash Kansara")
+                        email.set("akash-kansara@users.noreply.github.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/akash-kansara/modak.git")
+                    developerConnection.set("scm:git:ssh://github.com/akash-kansara/modak.git")
+                    url.set("https://github.com/akash-kansara/modak")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    val signingKey: String? = System.getenv("GPG_PRIVATE_KEY")
+    val signingPassword: String? = System.getenv("GPG_PASSPHRASE")
+
+    isRequired = signingKey != null && signingPassword != null
+
+    if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications["mavenJava"])
+    }
+}
+
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+tasks.register<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.javadoc)
+}
+
+artifacts {
+    add("archives", tasks["sourcesJar"])
+    add("archives", tasks["javadocJar"])
 }

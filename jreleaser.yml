@@ -1,0 +1,45 @@
+project:
+  name: modak
+  version: {{projectVersion}}
+  description: A Kotlin/Java library for auto-correcting data using annotations
+  website: https://github.com/akash-kansara/modak
+  authors:
+    - Akash Kansara
+  license: MIT
+
+release:
+  github:
+    owner: akash-kansara
+    name: modak
+    tagName: '{{projectVersion}}'
+    releaseName: 'modak {{projectVersion}}'
+    changelog:
+      enabled: true
+    sign: true
+
+signing:
+  active: ALWAYS
+  armored: true
+  key: ENV[GPG_PRIVATE_KEY]
+  passphrase: ENV[GPG_PASSPHRASE]
+
+deploy:
+  maven:
+    mavenCentral:
+      release-deploy:
+        active: RELEASE
+        url: https://central.sonatype.com/api/v1/publisher
+        stagingRepositories:
+          - target/staging-deploy
+      signing:
+        key: ENV[GPG_PRIVATE_KEY]
+        passphrase: ENV[GPG_PASSPHRASE]
+      artifacts:
+        - path: api/build/libs/modak-api-{{projectVersion}}.jar
+          javadoc: api/build/libs/modak-api-{{projectVersion}}-javadoc.jar
+          sources: api/build/libs/modak-api-{{projectVersion}}-sources.jar
+          pom: api/build/libs/modak-api-{{projectVersion}}.pom
+        - path: core/build/libs/modak-core-{{projectVersion}}.jar
+          javadoc: core/build/libs/modak-core-{{projectVersion}}-javadoc.jar
+          sources: core/build/libs/modak-core-{{projectVersion}}-sources.jar
+          pom: core/build/libs/modak-core-{{projectVersion}}.pom
