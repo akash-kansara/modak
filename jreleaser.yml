@@ -20,17 +20,13 @@ release:
     sign: true
 
 signing:
-  active: ALWAYS
-  armored: false
-  command:
-    executable: gpg
-    defaultKeyring: true
-  mode: COMMAND
+  active: NEVER
 
 deploy:
   maven:
     mavenCentral:
       sonatype:
+        sign: false
         active: ALWAYS
         url: https://central.sonatype.com/api/v1/publisher
         namespace: io.github.akash-kansara

@@ -70,13 +70,14 @@ publishing {
 }
 
 signing {
+    val signingKeyId: String? = System.getenv("JRELEASER_GPG_KEY_ID")
     val signingKey: String? = System.getenv("GPG_PRIVATE_KEY")
     val signingPassword: String? = System.getenv("GPG_PASSPHRASE")
 
-    isRequired = signingKey != null && signingPassword != null
+    isRequired = signingKeyId != null && signingKey != null && signingPassword != null
 
     if (signingKey != null && signingPassword != null) {
-        useInMemoryPgpKeys(signingKey, signingPassword)
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
         sign(publishing.publications["mavenJava"])
     }
 }
