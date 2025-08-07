@@ -5,9 +5,13 @@
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=akash-kansara_modak&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=akash-kansara_modak)
 [![Security](https://sonarcloud.io/api/project_badges/measure?project=akash-kansara_modak&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=akash-kansara_modak)
 [![License](https://img.shields.io/github/license/akash-kansara/modak)](LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.akash-kansara/modak)](https://search.maven.org/search?q=g:io.github.akash-kansara)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.akash-kansara/modak-core)](https://search.maven.org/search?q=g:io.github.akash-kansara)
 
 A robust Kotlin/Java library that automatically fixes common data validation issues (e.g., nulls, formatting, value mismatches) using annotation-driven correction logic. Seamlessly integrates with Jakarta Bean Validation and supports nested objects, group sequences, and container-level fixes.
+
+### 🍡 What's a Modak?
+
+**Modak** is a traditional Indian sweet, typically a dumpling, made with rice or wheat flour and filled with a sweet mixture, often grated coconut and jaggery.
 
 ## 📦 Installation
 
@@ -35,9 +39,9 @@ dependencies {
     <version>VERSION</version>
 </dependency>
 <dependency>
-    <groupId>io.github.akash-kansara</groupId>
-    <artifactId>modak-core</artifactId>
-    <version>VERSION</version>
+<groupId>io.github.akash-kansara</groupId>
+<artifactId>modak-core</artifactId>
+<version>VERSION</version>
 </dependency>
 ```
 
@@ -50,17 +54,17 @@ data class User(
     @field:Trim                                    // Remove leading/trailing whitespace
     @field:DefaultValue(strValue = "Anonymous")    // Set default if null/empty
     val name: String?,
-    
+
     @field:NotNull
     @field:DefaultValue(intValue = 18, constraintFilter = [NotNull::class])
     val age: Int?,
-    
+
     @field:Truncate(length = 100)                  // Limit length to 100 characters
     @field:Trim
     val bio: String?,
-    
+
     @field:RegexReplace(
-        regexPattern = "[^a-zA-Z0-9@._-]", 
+        regexPattern = "[^a-zA-Z0-9@._-]",
         replaceStr = ""
     )
     val email: String?
@@ -87,7 +91,7 @@ when (val result = corrector.correct(user, false, null)) {
     is CorrectionResult.Success -> {
         val correctedUser = result.correctedObject
         val appliedCorrections = result.appliedCorrections
-        
+
         println("Corrected user: $correctedUser")
         println("Applied ${appliedCorrections.size} corrections")
     }
@@ -103,14 +107,22 @@ when (val result = corrector.correct(user, false, null)) {
 
 ## ✨ Key Features
 
-🔧 **Automatic Data Correction** - Fix validation issues instead of just reporting them  
-📝 **Annotation-Based** - Simple annotations to define correction rules  
-🔗 **Jakarta Validation Integration** - Works with existing validation constraints  
-🎯 **Built-in Corrections** - Common corrections ready to use  
-🛠️ **Custom Corrections** - Easy to extend with your own logic  
+🔧 **Automatic Data Correction** - Fix validation issues instead of just reporting them
+
+📝 **Annotation-Based** - Simple annotations to define correction rules
+
+🔗 **Jakarta Validation Integration** - Works with existing validation constraints
+
+🎯 **Built-in Corrections** - Common corrections ready to use
+
+🛠️ **Custom Corrections** - Easy to extend with your own logic
+
 👥 **Group Support** - Apply corrections based on validation groups
+
 🎛️ **Constraint Filtering** - Target specific validation constraints
+
 🌳 **Nested Objects** - Automatically traverse and correct nested structures
+
 🛡️ **Type Safe** - Full Kotlin type safety with generics
 
 ## 🤝 Contributing
