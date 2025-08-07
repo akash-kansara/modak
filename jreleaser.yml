@@ -1,6 +1,5 @@
 project:
   name: modak
-  version: {{projectVersion}}
   description: A Kotlin/Java library for auto-correcting data using annotations
   website: https://github.com/akash-kansara/modak
   authors:
