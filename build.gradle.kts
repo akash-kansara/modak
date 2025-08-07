@@ -95,7 +95,11 @@ tasks.named("sonar") {
 // Publishing configuration
 
 tasks.register<Copy>("mergeStagingDeploys") {
+    dependsOn(":core:publish", ":api:publish")
     from(project(":core").layout.buildDirectory.dir("staging-deploy"))
     from(project(":api").layout.buildDirectory.dir("staging-deploy"))
     into(layout.buildDirectory.dir("staging-deploy"))
+    doLast {
+        println("Merged staging-deploys into root build/staging-deploy")
+    }
 }
