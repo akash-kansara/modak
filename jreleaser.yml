@@ -17,7 +17,7 @@ release:
     releaseName: 'modak {{projectVersion}}'
     changelog:
       enabled: true
-    sign: true
+    sign: false
 
 signing:
   active: NEVER
