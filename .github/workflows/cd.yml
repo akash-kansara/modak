@@ -29,6 +29,9 @@ jobs:
         run: ./gradlew clean build publish mergeStagingDeploys
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Inspect staging-deploy folders
         run: |
           echo "🔍 core/build/staging-deploy"
@@ -37,16 +40,12 @@ jobs:
           ls -R api/build/staging-deploy || echo "❌ api staging-deploy missing"
           echo "🔍 root build/staging-deploy (merged)"
           ls -R build/staging-deploy || echo "❌ merged staging-deploy missing"
-        env:
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - name: Release with JReleaser
         uses: jreleaser/release-action@v2
         with:
           arguments: full-release
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          JRELEASER_MAVENCENTRAL_SONATYPE_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          JRELEASER_MAVENCENTRAL_SONATYPE_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          JRELEASER_MAVENCENTRAL_SONATYPE_USERNAME: ${{ secrets.MAVENCENTRAL_SONATYPE_USERNAME }}
+          JRELEASER_MAVENCENTRAL_SONATYPE_TOKEN: ${{ secrets.MAVENCENTRAL_SONATYPE_TOKEN }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
