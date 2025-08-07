@@ -9,7 +9,7 @@ plugins {
 }
 
 allprojects {
-    group = "io.github.akashkansara"
+    group = "io.github.akash-kansara"
     version = System.getenv("JRELEASER_PROJECT_VERSION") ?: "0.0.1-SNAPSHOT"
     repositories {
         mavenCentral()

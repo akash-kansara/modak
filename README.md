@@ -5,7 +5,7 @@
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=akash-kansara_modak&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=akash-kansara_modak)
 [![Security](https://sonarcloud.io/api/project_badges/measure?project=akash-kansara_modak&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=akash-kansara_modak)
 [![License](https://img.shields.io/github/license/akash-kansara/modak)](LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.akashkansara/modak)](https://search.maven.org/search?q=g:io.github.akashkansara)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.akash-kansara/modak)](https://search.maven.org/search?q=g:io.github.akash-kansara)
 
 A robust Kotlin/Java library that automatically fixes common data validation issues (e.g., nulls, formatting, value mismatches) using annotation-driven correction logic. Seamlessly integrates with Jakarta Bean Validation and supports nested objects, group sequences, and container-level fixes.
 
@@ -14,28 +14,28 @@ A robust Kotlin/Java library that automatically fixes common data validation iss
 ### Gradle (Kotlin DSL)
 ```kotlin
 dependencies {
-    implementation("io.github.akashkansara:modak-api:1.0.0")
-    implementation("io.github.akashkansara:modak-core:1.0.0")
+    implementation("io.github.akash-kansara:modak-api:1.0.0")
+    implementation("io.github.akash-kansara:modak-core:1.0.0")
 }
 ```
 
 ### Gradle (Groovy DSL)
 ```groovy
 dependencies {
-    implementation 'io.github.akashkansara:modak-api:1.0.0'
-    implementation 'io.github.akashkansara:modak-core:1.0.0'
+    implementation 'io.github.akash-kansara:modak-api:1.0.0'
+    implementation 'io.github.akash-kansara:modak-core:1.0.0'
 }
 ```
 
 ### Maven
 ```xml
 <dependency>
-    <groupId>io.github.akashkansara</groupId>
+    <groupId>io.github.akash-kansara</groupId>
     <artifactId>modak-api</artifactId>
     <version>1.0.0</version>
 </dependency>
 <dependency>
-    <groupId>io.github.akashkansara</groupId>
+    <groupId>io.github.akash-kansara</groupId>
     <artifactId>modak-core</artifactId>
     <version>1.0.0</version>
 </dependency>

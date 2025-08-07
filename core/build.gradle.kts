@@ -70,7 +70,7 @@ publishing {
                 }
                 developers {
                     developer {
-                        id.set("akashkansara")
+                        id.set("akash-kansara")
                         name.set("Akash Kansara")
                         email.set("akash-kansara@users.noreply.github.com")
                     }

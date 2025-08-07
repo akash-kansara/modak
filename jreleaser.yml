@@ -7,7 +7,7 @@ project:
     - Akash Kansara
   license: MIT
   java:
-    groupId: io.github.akashkansara
+    groupId: io.github.akash-kansara
 
 release:
   github:
@@ -33,8 +33,6 @@ deploy:
       sonatype:
         active: ALWAYS
         url: https://central.sonatype.com/api/v1/publisher
-        username: ENV[OSSRH_USERNAME]
-        password: ENV[OSSRH_PASSWORD]
-        namespace: io.github.akashkansara
+        namespace: io.github.akash-kansara
         stagingRepositories:
           - build/staging-deploy
