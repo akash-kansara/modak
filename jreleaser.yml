@@ -21,19 +21,20 @@ release:
 
 signing:
   active: ALWAYS
-  armored: true
-  publicKey: ENV[JRELEASER_GPG_PUBLIC_KEY]
-  secretKey: ENV[JRELEASER_GPG_PRIVATE_KEY]
-  passphrase: ENV[JRELEASER_GPG_PASSPHRASE]
+  armored: false
+  command:
+    executable: gpg
+    defaultKeyring: true
+  mode: COMMAND
 
 deploy:
   maven:
     mavenCentral:
-      release-deploy:
-        active: RELEASE
+      sonatype:
+        active: ALWAYS
         url: https://central.sonatype.com/api/v1/publisher
         username: ENV[OSSRH_USERNAME]
         password: ENV[OSSRH_PASSWORD]
         namespace: io.github.akashkansara
         stagingRepositories:
-          - target/staging-deploy
+          - build/staging-deploy

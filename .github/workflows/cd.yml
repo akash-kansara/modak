@@ -16,8 +16,17 @@ jobs:
           java-version: 17
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
+      - name: Verify version
+        run: |
+          echo "Version from env: $JRELEASER_PROJECT_VERSION"
+          if [[ -z "$JRELEASER_PROJECT_VERSION" ]]; then
+          echo "❌ JRELEASER_PROJECT_VERSION is not set!"
+          exit 1
+          fi
+        env:
+          JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
       - name: Build JARs
-        run: ./gradlew clean build publish --no-daemon
+        run: ./gradlew clean build publish mergeStagingDeploys
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
       - name: Release with JReleaser

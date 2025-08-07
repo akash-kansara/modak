@@ -8,14 +8,9 @@ plugins {
     jacoco
 }
 
-object ProjectInfo {
-    val version = System.getenv("JRELEASER_PROJECT_VERSION") ?: "1.0.0"
-    const val group = "io.github.akashkansara"
-}
-
 allprojects {
-    group = ProjectInfo.group
-    version = ProjectInfo.version
+    group = "io.github.akashkansara"
+    version = System.getenv("JRELEASER_PROJECT_VERSION") ?: "0.0.1-SNAPSHOT"
     repositories {
         mavenCentral()
     }
@@ -95,4 +90,18 @@ sonarqube {
 
 tasks.named("sonar") {
     dependsOn("jacocoRootReport")
+}
+
+// Publishing configuration
+
+tasks.register<Copy>("mergeStagingDeploys") {
+    from(project(":core").layout.buildDirectory.dir("staging-deploy"))
+    from(project(":api").layout.buildDirectory.dir("staging-deploy"))
+    into(layout.buildDirectory.dir("staging-deploy"))
+}
+
+tasks.register("printVersion") {
+    doLast {
+        println("Project version is: $version")
+    }
 }
