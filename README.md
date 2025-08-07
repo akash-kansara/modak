@@ -14,16 +14,16 @@ A robust Kotlin/Java library that automatically fixes common data validation iss
 ### Gradle (Kotlin DSL)
 ```kotlin
 dependencies {
-    implementation("io.github.akash-kansara:modak-api:1.0.0")
-    implementation("io.github.akash-kansara:modak-core:1.0.0")
+    implementation("io.github.akash-kansara:modak-api:$version")
+    implementation("io.github.akash-kansara:modak-core:$version")
 }
 ```
 
 ### Gradle (Groovy DSL)
 ```groovy
 dependencies {
-    implementation 'io.github.akash-kansara:modak-api:1.0.0'
-    implementation 'io.github.akash-kansara:modak-core:1.0.0'
+    implementation 'io.github.akash-kansara:modak-api:$version'
+    implementation 'io.github.akash-kansara:modak-core:$version'
 }
 ```
 
@@ -32,12 +32,12 @@ dependencies {
 <dependency>
     <groupId>io.github.akash-kansara</groupId>
     <artifactId>modak-api</artifactId>
-    <version>1.0.0</version>
+    <version>VERSION</version>
 </dependency>
 <dependency>
     <groupId>io.github.akash-kansara</groupId>
     <artifactId>modak-core</artifactId>
-    <version>1.0.0</version>
+    <version>VERSION</version>
 </dependency>
 ```
 
