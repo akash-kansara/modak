@@ -22,6 +22,9 @@ release:
 signing:
   active: ALWAYS
   armored: true
+  publicKey: ENV[JRELEASER_GPG_PUBLIC_KEY]
+  secretKey: ENV[JRELEASER_GPG_PRIVATE_KEY]
+  passphrase: ENV[JRELEASER_GPG_PASSPHRASE]
 
 deploy:
   maven:
