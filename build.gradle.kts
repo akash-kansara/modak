@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     id("org.sonarqube") version "6.2.0.5505"
     jacoco
-    id("org.jreleaser") version "1.12.0"
 }
 
 object ProjectInfo {

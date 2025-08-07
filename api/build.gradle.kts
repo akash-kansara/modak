@@ -57,6 +57,11 @@ publishing {
             }
         }
     }
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
+        }
+    }
 }
 
 signing {

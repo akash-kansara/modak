@@ -18,6 +18,8 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build JARs
         run: ./gradlew clean build --no-daemon
+        env:
+          JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
       - name: Release with JReleaser
         uses: jreleaser/release-action@v2
         with:
