@@ -1,0 +1,34 @@
+name: "\U0001F680 Feature Request / Discussion"
+description: Propose a new feature or enhancement
+labels: ["enhancement", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Please describe your feature idea or enhancement. Provide use cases and potential design if possible.**
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: Describe scenarios where this feature would be helpful.
+      placeholder: This feature could be used when...
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature description
+      description: Explain what the feature should do.
+      placeholder: The feature would support...
+
+  - type: textarea
+    id: proposed-api
+    attributes:
+      label: API Design (optional)
+      description: Propose the syntax or API you envision.
+      render: kotlin
+      placeholder: |
+        @MyNewAnnotation
+        data class Sample(
+            val name: String
+        )

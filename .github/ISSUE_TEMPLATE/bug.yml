@@ -1,0 +1,46 @@
+name: "\U0001F41E Bug Report"
+description: Report incorrect behavior or crashes
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Please describe the bug clearly. Include steps to reproduce and expected behavior.**
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: What is happening?
+      description: Describe the unexpected behavior you're seeing.
+      placeholder: I tried X and expected Y, but got Z instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What did you expect to happen?
+      placeholder: The correct behavior should be...
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-message
+    attributes:
+      label: Error message (if any)
+      description: Paste the full stack trace or error message.
+      render: shell
+
+  - type: textarea
+    id: minimal-repro
+    attributes:
+      label: Minimal reproducible code
+      description: Include a small, self-contained snippet that reproduces the bug.
+      render: kotlin
+      placeholder: |
+        @Test
+        fun `reproduce the bug`() {
+            // sample code
+        }
+    validations:
+      required: true

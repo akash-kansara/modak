@@ -1,0 +1,21 @@
+[versions]
+guava = "33.3.1-jre"
+junit-jupiter = "5.11.1"
+arrow-kt-core = "2.1.2"
+jakarta-validation = "3.1.0"
+hibernate-validator = "9.0.1.Final"
+glassfish-expressly = "6.0.0"
+mockk = "1.13.12"
+
+[libraries]
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+arrow-kt-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow-kt-core" }
+jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta-validation" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+hibernate-validator = { module = "org.hibernate.validator:hibernate-validator", version.ref = "hibernate-validator" }
+glassfish-expressly = { module = "org.glassfish.expressly:expressly", version.ref = "glassfish-expressly" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.0.21" }
