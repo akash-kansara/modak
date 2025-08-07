@@ -22,8 +22,6 @@ release:
 signing:
   active: ALWAYS
   armored: true
-  secretKey: ENV[GPG_PRIVATE_KEY]
-  passphrase: ENV[GPG_PASSPHRASE]
 
 deploy:
   maven:
