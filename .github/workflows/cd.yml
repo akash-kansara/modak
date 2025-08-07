@@ -18,13 +18,13 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build JARs
         run: ./gradlew clean build --no-daemon
-      - name: Download & Install JReleaser
-        run: curl -Ls https://git.io/install-jreleaser | bash
       - name: Release with JReleaser
-        run: jreleaser full-release
+        uses: jreleaser/release-action@v2
+        with:
+          arguments: full-release
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
+          JRELEASER_GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          JRELEASER_OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
