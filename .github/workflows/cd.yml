@@ -29,6 +29,14 @@ jobs:
         run: ./gradlew clean build publish mergeStagingDeploys
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
+      - name: Inspect staging-deploy folders
+        run: |
+          echo "🔍 core/build/staging-deploy"
+          ls -R core/build/staging-deploy || echo "❌ core staging-deploy missing"
+          echo "🔍 api/build/staging-deploy"
+          ls -R api/build/staging-deploy || echo "❌ api staging-deploy missing"
+          echo "🔍 root build/staging-deploy (merged)"
+          ls -R build/staging-deploy || echo "❌ merged staging-deploy missing"
       - name: Release with JReleaser
         uses: jreleaser/release-action@v2
         with:

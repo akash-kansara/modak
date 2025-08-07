@@ -99,9 +99,3 @@ tasks.register<Copy>("mergeStagingDeploys") {
     from(project(":api").layout.buildDirectory.dir("staging-deploy"))
     into(layout.buildDirectory.dir("staging-deploy"))
 }
-
-tasks.register("printVersion") {
-    doLast {
-        println("Project version is: $version")
-    }
-}
