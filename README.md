@@ -115,7 +115,7 @@ public class UserCorrectionApplier implements CorrectionApplier<UserCorrection, 
 }
 ```
 
-### 2. Define your model with Corrections
+### 2. Define your model with corrections
 
 ```java
 @UserCorrection(
@@ -151,7 +151,7 @@ public class User {
 }
 ```
 
-### 3. Create and Use the Corrector
+### 3. Correct your data
 
 ```java
 Corrector corrector = (new CorrectorFactory()).buildCorrector();
