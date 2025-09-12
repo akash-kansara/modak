@@ -7,7 +7,20 @@
 [![License](https://img.shields.io/github/license/akash-kansara/modak)](LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.akash-kansara/modak-core)](https://search.maven.org/search?q=g:io.github.akash-kansara)
 
-A robust Kotlin/Java library that automatically fixes common data validation issues (e.g., nulls, formatting, value mismatches) using annotation-driven correction logic. Seamlessly integrates with Jakarta Bean Validation and supports nested objects, group sequences, and container-level fixes.
+Modak is a companion library to [Jakarta Bean Validation](https://beanvalidation.org/).
+**Bean Validation** defines **constraints** and checks whether your object model is valid.
+**Modak** focuses only on **data correction**: applying annotation-based rules to automatically fix data.
+
+If you are already using Bean Validation (Hibernate Validator, Apache BVal, or any implementation) and need automatic correction/sanitization, Modak integrates seamlessly as a drop-in companion.
+
+It can also be used standalone, without Bean Validation, whenever you need annotation-driven data correction.
+
+Main features:
+
+1. Lets you express data correction rules on object models via annotations
+2. Lets you write custom constraint in an extensible way
+3. Provides APIs to correct objects
+4. Works for Java & Kotlin projects
 
 ### 🍡 What's a Modak?
 
@@ -18,6 +31,10 @@ A robust Kotlin/Java library that automatically fixes common data validation iss
 ### Gradle (Kotlin DSL)
 ```kotlin
 dependencies {
+    // Add only if you're not using bean validation already
+    implementation("jakarta.validation:jakarta.validation-api:3.1.0")
+
+    // Modak dependencies
     implementation("io.github.akash-kansara:modak-api:$version")
     implementation("io.github.akash-kansara:modak-core:$version")
 }
@@ -26,6 +43,10 @@ dependencies {
 ### Gradle (Groovy DSL)
 ```groovy
 dependencies {
+    // Add only if you're not using bean validation already
+    implementation("jakarta.validation:jakarta.validation-api:3.1.0")
+
+    // Modak dependencies
     implementation 'io.github.akash-kansara:modak-api:$version'
     implementation 'io.github.akash-kansara:modak-core:$version'
 }
@@ -33,71 +54,123 @@ dependencies {
 
 ### Maven
 ```xml
+<!-- Add only if you're not using bean validation already -->
+<dependency>
+    <groupId>jakarta.validation</groupId>
+    <artifactId>jakarta.validation-api</artifactId>
+    <version>3.1.0</version>
+</dependency>
+
+<!-- Modak dependencies -->
 <dependency>
     <groupId>io.github.akash-kansara</groupId>
     <artifactId>modak-api</artifactId>
     <version>VERSION</version>
 </dependency>
 <dependency>
-<groupId>io.github.akash-kansara</groupId>
-<artifactId>modak-core</artifactId>
-<version>VERSION</version>
+    <groupId>io.github.akash-kansara</groupId>
+    <artifactId>modak-core</artifactId>
+    <version>VERSION</version>
 </dependency>
 ```
 
 ## 🚀 Quick Start
 
-### 1. Define Your Data Class with Corrections
+### 1. Define your corrections
 
-```kotlin
-data class User(
-    @field:Trim                                    // Remove leading/trailing whitespace
-    @field:DefaultValue(strValue = "Anonymous")    // Set default if null/empty
-    val name: String?,
+```java
+// Annotation:
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@Correction(correctedBy = {UserCorrectionApplier.class})
+public @interface UserCorrection {
+    String defaultRole() default "USER";
+    String adminRole() default "ADMIN";
+}
 
-    @field:NotNull
-    @field:DefaultValue(intValue = 18, constraintFilter = [NotNull::class])
-    val age: Int?,
+// Correction applier:
+public class UserCorrectionApplier implements CorrectionApplier<UserCorrection, User> {
+    private String defaultRole;
+    private String adminRole;
 
-    @field:Truncate(length = 100)                  // Limit length to 100 characters
-    @field:Trim
-    val bio: String?,
+    @Override
+    public void initialize(UserCorrection annotation) {
+        this.defaultRole = annotation.defaultRole();
+        this.adminRole = annotation.adminRole();
+    }
 
-    @field:RegexReplace(
-        regexPattern = "[^a-zA-Z0-9@._-]",
-        replaceStr = ""
-    )
-    val email: String?
-)
+    @Override
+    public CorrectionApplierResult<User> correct(User user, CorrectionApplierContext context) {
+        if (user.role == null) {
+            String newRole = this.defaultRole;
+            if (user.email != null && user.email.endsWith("@company.com")) {
+                newRole = this.adminRole;
+            }
+            user.role = newRole;
+            return new CorrectionApplierResult.Edited<>(user, user); // Left value is original, right is corrected. Here we're updating in-place but you can return a new instance as well
+        } else {
+            return new CorrectionApplierResult.NoChange<>();
+        }
+    }
+}
 ```
 
-### 2. Create and Use the Corrector
+### 2. Define your model with corrections
 
-```kotlin
-// Create corrector instance
-val corrector = CorrectorFactory().buildCorrector()
-
-// Create user with data issues
-val user = User(
-    name = "  ", // Empty after trimming - will be corrected to "Anonymous"
-    age = null,  // Null - will be corrected to 18
-    bio = "This is a very long biography that exceeds the maximum allowed length and will be truncated to fit within the specified limit of 100 characters. This part will be removed.",
-    email = "user@domain!#$.com" // Invalid characters - will be cleaned
+```java
+@UserCorrection(
+        defaultRole = "DEFAULT",
+        adminRole = "ADMIN"
 )
+public class User {
+    @Trim                                       // Provided by library
+    @DefaultValue(strValue = "Anonymous")       // If you're using getter/setter, you can annotate the getter instead of fields
+    public String name;
 
-// Apply corrections
-// Parameters: object, correctViolationsOnly, constraintViolations, groups
-when (val result = corrector.correct(user, false, null)) {
-    is CorrectionResult.Success -> {
-        val correctedUser = result.correctedObject
-        val appliedCorrections = result.appliedCorrections
+    @NotNull
+    @DefaultValue(                              // Provided by library
+            intValue = 18,
+            constraintFilter = {NotNull.class}
+    )
+    public Integer age;
 
-        println("Corrected user: $correctedUser")
-        println("Applied ${appliedCorrections.size} corrections")
+    public String role;
+
+    @RegexReplace(                              // Provided by library
+            regexPattern = "[^a-zA-Z0-9@._-]",
+            replaceStr = ""
+    )
+    public String email;
+
+    public User(String name, Integer age, String role, String email) {
+        this.name = name;
+        this.age = age;
+        this.role = role;
+        this.email = email;
     }
-    is CorrectionResult.Failure -> {
-        println("Correction failed: ${result.error.message}")
-    }
+}
+```
+
+### 3. Correct your data
+
+```java
+Corrector corrector = (new CorrectorFactory()).buildCorrector();
+
+User user = new User(null, null, null, "example@com!pany.com");
+
+CorrectionResult<User, ErrorLike> result = corrector.correct(
+        user,
+        false,
+        HashSet.newHashSet(0)
+);
+
+System.out.println(result.isSuccess());         // true
+
+if (result instanceof CorrectionResult.Success<User, ErrorLike> success) {
+        System.out.println(                     // 4
+            success.getAppliedCorrections().size()
+        );
+        System.out.println(user);               // User{name='Anonymous', age=18, role='ADMIN', email='example@company.com'}
 }
 ```
 
@@ -107,7 +180,7 @@ when (val result = corrector.correct(user, false, null)) {
 
 ## ✨ Key Features
 
-🔧 **Automatic Data Correction** - Fix validation issues instead of just reporting them
+🔧 **Automatic Data Correction** - Fix data issues
 
 📝 **Annotation-Based** - Simple annotations to define correction rules
 
@@ -117,7 +190,7 @@ when (val result = corrector.correct(user, false, null)) {
 
 🛠️ **Custom Corrections** - Easy to extend with your own logic
 
-👥 **Group Support** - Apply corrections based on validation groups
+👥 **Group Support** - Sequence, filter corrections based on groups & group sequences
 
 🎛️ **Constraint Filtering** - Target specific validation constraints
 
