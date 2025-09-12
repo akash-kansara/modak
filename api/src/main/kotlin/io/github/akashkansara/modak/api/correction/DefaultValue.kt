@@ -4,6 +4,25 @@ import io.github.akashkansara.modak.api.Correction
 import io.github.akashkansara.modak.api.CorrectionTarget
 import kotlin.reflect.KClass
 
+/**
+ * Sets default values for null values
+ *
+ * @param groups Validation groups for which this correction applies
+ * @param payload Payload classes attached to this correction
+ * @param constraintFilter Constraint types that trigger this correction
+ * @param correctionTarget What should be corrected (property or container elements)
+ * @param strValue Default string value
+ * @param intValue Default integer value
+ * @param longValue Default long value
+ * @param doubleValue Default double value
+ * @param floatValue Default float value
+ * @param booleanValue Default boolean value
+ * @param charValue Default character value
+ * @param byteValue Default byte value
+ * @param shortValue Default short value
+ * @param enumValueClass Enum class for default enum value
+ * @param enumValueName Name of the default enum value
+ */
 @Correction(correctedBy = [])
 annotation class DefaultValue(
     val groups: Array<KClass<*>> = [],

@@ -34,7 +34,6 @@ class BeanModifier(
 ) : TraversalCallback<BeanModificationContext<*>> {
     fun <T> modifyBean(
         bean: T,
-        correctViolationsOnly: Boolean,
         constraintViolations: Set<ConstraintViolation<T>>? = null,
         groups: List<Class<*>>? = null,
     ): Either<InternalError, List<AppliedCorrection<T>>> {
@@ -46,8 +45,7 @@ class BeanModifier(
             val beanModificationContext = BeanModificationContext(
                 bean,
                 GroupSequenceIterator(sequence),
-                constraintViolations ?: emptySet(),
-                correctViolationsOnly,
+                constraintViolations,
             )
             val corrections = modifyBeanInContext(beanModificationContext).bind()
             beanModificationContext.clear()
@@ -290,7 +288,7 @@ class BeanModifier(
         if (!beanModificationContext.correctViolationsOnly) return true
         val constraintFilter = correctionMeta.constraintFilter
         if (constraintFilter.isEmpty()) return false
-        val constraints = beanModificationContext.constraintViolationsMap[currentPath.toString()]
+        val constraints = beanModificationContext.constraintViolationsMap?.let { it[currentPath.toString()] }
         return constraints?.any {
             constraintFilter.contains(it.constraintDescriptor.annotation.annotationClass.java)
         } ?: false

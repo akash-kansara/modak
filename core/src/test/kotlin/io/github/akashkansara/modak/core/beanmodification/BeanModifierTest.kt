@@ -53,7 +53,7 @@ class BeanModifierTest {
     @Test
     fun `should apply all corrections to bean when no filters are supplied`() {
         val bean = buildCompany()
-        val correctionResult = beanModifier.modifyBean(bean, false, null, null)
+        val correctionResult = beanModifier.modifyBean(bean, null, null)
         assertTrue(correctionResult.isRight())
         val result = correctionResult.getOrNull()!!
         val expectedResult = buildValidCompany(emptyList())
@@ -215,7 +215,6 @@ class BeanModifierTest {
         )
         val correctionResult = beanModifier.modifyBean(
             bean,
-            false,
             null,
             listOf(SloughGroup::class.java, BranchGroup::class.java),
         )
@@ -334,7 +333,6 @@ class BeanModifierTest {
         val constraintViolations = validator.validate(bean)
         val correctionResult = beanModifier.modifyBean(
             bean,
-            true,
             constraintViolations,
             null,
         )
@@ -376,7 +374,6 @@ class BeanModifierTest {
         )
         val correctionResult = beanModifier.modifyBean(
             bean,
-            false,
             null,
             fixGroups.map { it.java },
         )
@@ -600,7 +597,7 @@ class BeanModifierTest {
     @Test
     fun `should apply no corrections when bean requires no corrections`() {
         val bean = buildValidMinimalCompany()
-        val correctionResult = beanModifier.modifyBean(bean, false, null, null)
+        val correctionResult = beanModifier.modifyBean(bean, null, null)
         assertTrue(correctionResult.isRight())
         val result = correctionResult.getOrNull()!!
         val expectedResult = buildValidMinimalCompany()
@@ -614,7 +611,7 @@ class BeanModifierTest {
 
     @Test
     fun `should apply no corrections when bean is null`() {
-        val correctionResult = beanModifier.modifyBean(null, false, null, null)
+        val correctionResult = beanModifier.modifyBean(null, null, null)
         assertTrue(correctionResult.isRight())
         val result = correctionResult.getOrNull()!!
         assertIterableEquals(emptyList<ExpectedCorrection>(), toExpectedCorrections(result))
@@ -631,7 +628,7 @@ class BeanModifierTest {
                 callOriginal()
             }
         }
-        val correctionResult = beanModifier.modifyBean(bean, false, null, null)
+        val correctionResult = beanModifier.modifyBean(bean, null, null)
         assertTrue(correctionResult.isLeft())
         val result = correctionResult.leftOrNull()!! as InternalError.BeanModificationError
         assertEquals(3, result.appliedCorrections.size)

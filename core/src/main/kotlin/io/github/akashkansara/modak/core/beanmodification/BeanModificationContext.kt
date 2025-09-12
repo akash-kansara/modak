@@ -11,12 +11,12 @@ import jakarta.validation.ConstraintViolation
 class BeanModificationContext<T>(
     val root: T,
     private val groupSequenceIterator: GroupSequenceIterator,
-    constraintViolations: Set<ConstraintViolation<T>>,
-    val correctViolationsOnly: Boolean,
+    constraintViolations: Set<ConstraintViolation<T>>?,
 ) {
     private var currentGroup: Class<*>? = null
     private val appliedCorrections = mutableListOf<AppliedCorrection<T>>()
-    val constraintViolationsMap = constraintViolations.groupBy { it.propertyPath.toString() }.toMutableMap()
+    val constraintViolationsMap = constraintViolations?.groupBy { it.propertyPath.toString() }?.toMutableMap()
+    val correctViolationsOnly = constraintViolations != null
 
     fun nextGroup() = if (groupSequenceIterator.hasNext()) {
         currentGroup = groupSequenceIterator.next()
@@ -54,6 +54,6 @@ class BeanModificationContext<T>(
     fun getCorrections(): List<AppliedCorrection<T>> = appliedCorrections.toList()
 
     fun clear() {
-        constraintViolationsMap.clear()
+        constraintViolationsMap?.clear()
     }
 }

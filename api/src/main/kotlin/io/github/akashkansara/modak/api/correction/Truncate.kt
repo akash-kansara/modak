@@ -4,6 +4,16 @@ import io.github.akashkansara.modak.api.Correction
 import io.github.akashkansara.modak.api.CorrectionTarget
 import kotlin.reflect.KClass
 
+/**
+ * Limits string length by truncating excess characters.
+ *
+ * @param groups Validation groups for which this correction applies
+ * @param payload Payload classes attached to this correction
+ * @param constraintFilter Constraint types that trigger this correction
+ * @param correctionTarget What should be corrected (property or container elements)
+ * @param length The maximum allowed length for the field value
+ * @param fromEnd Whether to truncate from the start or the end of the string, defaults to `true`
+ */
 @Correction(correctedBy = [])
 annotation class Truncate(
     val groups: Array<KClass<*>> = [],

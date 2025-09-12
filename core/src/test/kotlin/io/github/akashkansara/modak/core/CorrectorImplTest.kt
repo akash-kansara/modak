@@ -10,6 +10,7 @@ import io.github.akashkansara.modak.core.models.InternalError
 import io.github.akashkansara.modak.core.testbed.beans.Company
 import io.github.akashkansara.modak.core.testbed.buildCompany
 import io.mockk.every
+import jakarta.validation.Validation
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertIterableEquals
@@ -21,6 +22,7 @@ class CorrectorImplTest {
     private val testFactory = TestCorrectorFactory
     private lateinit var beanModifier: BeanModifier
     private lateinit var corrector: Corrector
+    private val validator = Validation.byDefaultProvider().configure().buildValidatorFactory().validator
 
     @BeforeEach
     fun setUp() {
@@ -33,12 +35,12 @@ class CorrectorImplTest {
     fun `should apply all corrections to bean`() {
         val bean = buildCompany()
         var actualCorrections: List<AppliedCorrection<*>> = emptyList()
-        every { beanModifier.modifyBean(any<Company>(), any(), any(), any()) } coAnswers {
+        every { beanModifier.modifyBean(any<Company>(), any(), any()) } coAnswers {
             val modificationResult = callOriginal()
             actualCorrections = modificationResult.getOrNull()!!
             modificationResult
         }
-        val result = corrector.correct(bean, false, null)
+        val result = corrector.correct(bean)
         assertTrue(result.isSuccess)
         assertIterableEquals((result as CorrectionResult.Success).appliedCorrections, actualCorrections)
     }
@@ -54,8 +56,23 @@ class CorrectorImplTest {
                 callOriginal()
             }
         }
-        val result = corrector.correct(bean, false, null, DefaultGroup::class.java)
+        val result = corrector.correct(bean, DefaultGroup::class.java)
         assertFalse(result.isSuccess)
         assertEquals(3, (result as CorrectionResult.Failure).error.appliedCorrections.size)
+    }
+
+    @Test
+    fun `should apply all corrections to bean with violations`() {
+        val bean = buildCompany()
+        val violations = validator.validate(bean)
+        var actualCorrections: List<AppliedCorrection<*>> = emptyList()
+        every { beanModifier.modifyBean(any<Company>(), any(), any()) } coAnswers {
+            val modificationResult = callOriginal()
+            actualCorrections = modificationResult.getOrNull()!!
+            modificationResult
+        }
+        val result = corrector.correct(bean, violations)
+        assertTrue(result.isSuccess)
+        assertIterableEquals((result as CorrectionResult.Success).appliedCorrections, actualCorrections)
     }
 }

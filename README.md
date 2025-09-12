@@ -154,15 +154,11 @@ public class User {
 ### 3. Correct your data
 
 ```java
-Corrector corrector = (new CorrectorFactory()).buildCorrector();
+Corrector corrector = CorrectorFactory.buildCorrector();
 
 User user = new User(null, null, null, "example@com!pany.com");
 
-CorrectionResult<User, ErrorLike> result = corrector.correct(
-        user,
-        false,
-        HashSet.newHashSet(0)
-);
+CorrectionResult<User, ErrorLike> result = corrector.correct(user);
 
 System.out.println(result.isSuccess());         // true
 
