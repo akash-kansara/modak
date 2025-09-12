@@ -459,7 +459,7 @@ val company = Company(
 )
 
 val corrector = CorrectorFactory().buildCorrector()
-when (val result = corrector.correct(company, false, null)) {
+when (val result = corrector.correct(company)) {
     is CorrectionResult.Success -> {
         val correctedUser = result.correctedObject
         val appliedCorrections = result.appliedCorrections
@@ -503,9 +503,13 @@ Function for applying corrections:
 ```kotlin
 fun <T> correct(
   obj: T,
-  correctViolationsOnly: Boolean,
-  constraintViolations: Set<ConstraintViolation<T>>?,
   vararg groups: Class<*>
+): CorrectionResult<T, ErrorLike>
+
+fun <T> correct(
+  obj: T,
+  constraintViolations: Set<ConstraintViolation<T>>,
+  vararg groups: Class<*>,
 ): CorrectionResult<T, ErrorLike>
 ```
 
@@ -693,7 +697,6 @@ val validator = Validation.buildDefaultValidatorFactory().validator
 val violations = validator.validate(correctionResult.correctedObject)
 val correctionResult = corrector.correct(
     user,
-    true, // Only run corrections for which violations were reported
     violations
 )
 ```
