@@ -1,5 +1,7 @@
 package io.github.akashkansara.modak.core
 
+import arrow.core.Either
+import io.github.akashkansara.modak.api.AppliedCorrection
 import io.github.akashkansara.modak.api.CorrectionResult
 import io.github.akashkansara.modak.api.Corrector
 import io.github.akashkansara.modak.api.ErrorLike
@@ -8,27 +10,38 @@ import io.github.akashkansara.modak.core.models.ErrorLikeImpl
 import io.github.akashkansara.modak.core.models.InternalError
 import jakarta.validation.ConstraintViolation
 
-class CorrectorImpl(
-    private val beanModifier: BeanModifier,
-) : Corrector {
+class CorrectorImpl(private val beanModifier: BeanModifier) : Corrector {
     override fun <T> correct(
         obj: T,
-        correctViolationsOnly: Boolean,
-        constraintViolations: Set<ConstraintViolation<T>>?,
         vararg groups: Class<*>,
     ): CorrectionResult<T, ErrorLike> {
-        val groupList = if (groups.isEmpty()) {
+        val groupList = getGroupList(*groups)
+        val modifyBeanResult = beanModifier.modifyBean(obj, null, groupList)
+        return processModificationResult(modifyBeanResult)
+    }
+
+    override fun <T> correct(
+        obj: T,
+        constraintViolations: Set<ConstraintViolation<T>>,
+        vararg groups: Class<*>,
+    ): CorrectionResult<T, ErrorLike> {
+        val groupList = getGroupList(*groups)
+        val modifyBeanResult = beanModifier.modifyBean(obj, constraintViolations, groupList)
+        return processModificationResult(modifyBeanResult)
+    }
+
+    private fun getGroupList(vararg groups: Class<*>): List<Class<*>>? {
+        return if (groups.isEmpty()) {
             null
         } else {
             groups.toList()
         }
-        val modifyBeanResult = beanModifier.modifyBean(
-            obj,
-            correctViolationsOnly,
-            constraintViolations,
-            groupList,
-        )
-        return modifyBeanResult.fold(
+    }
+
+    private fun <T> processModificationResult(
+        result: Either<InternalError, List<AppliedCorrection<T>>>,
+    ): CorrectionResult<T, ErrorLike> {
+        return result.fold(
             ifLeft = {
                 val appliedCorrections = when (it) {
                     is InternalError.BeanModificationError -> it.appliedCorrections

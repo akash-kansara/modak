@@ -5,8 +5,12 @@ import jakarta.validation.ConstraintViolation
 interface Corrector {
     fun <T> correct(
         obj: T,
-        correctViolationsOnly: Boolean,
-        constraintViolations: Set<ConstraintViolation<T>>?,
+        vararg groups: Class<*>,
+    ): CorrectionResult<T, ErrorLike>
+
+    fun <T> correct(
+        obj: T,
+        constraintViolations: Set<ConstraintViolation<T>>,
         vararg groups: Class<*>,
     ): CorrectionResult<T, ErrorLike>
 }
