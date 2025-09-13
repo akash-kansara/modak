@@ -18,7 +18,7 @@ dependencies {
 
     implementation(libs.arrow.kt.core)
     implementation(libs.guava)
-    implementation(libs.jakarta.validation.api)
+    api(libs.jakarta.validation.api)
 
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.hibernate.validator)

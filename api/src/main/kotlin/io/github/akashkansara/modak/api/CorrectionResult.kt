@@ -3,7 +3,7 @@ package io.github.akashkansara.modak.api
 /**
  * Result of a correction operation performed by a Corrector.
  */
-sealed class CorrectionResult<out T, out E : ErrorLike> {
+sealed class CorrectionResult<out T> {
     /**
      * Indicates whether the correction operation was successful.
      */
@@ -17,14 +17,14 @@ sealed class CorrectionResult<out T, out E : ErrorLike> {
      */
     class Success<T> (
         val appliedCorrections: List<AppliedCorrection<T>>,
-    ) : CorrectionResult<T, Nothing>()
+    ) : CorrectionResult<T>()
 
     /**
      * Failed correction result.
      *
      * @param error The error that occurred during correction
      */
-    class Failure<E : ErrorLike> (
-        val error: E,
-    ) : CorrectionResult<Nothing, E>()
+    class Failure(
+        val error: Error,
+    ) : CorrectionResult<Nothing>()
 }

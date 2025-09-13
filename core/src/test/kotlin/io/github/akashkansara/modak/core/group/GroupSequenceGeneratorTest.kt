@@ -60,8 +60,9 @@ class GroupSequenceGeneratorTest {
         val result = generator.generateGroupSequence(inputGroups)
         assertTrue(result.isRight())
         val groups = result.getOrNull()!!
-        assertTrue(groups.contains(RegionalBranchGroup::class.java))
-        assertTrue(groups.contains(BranchGroup::class.java))
+        assertEquals(2, groups.size)
+        assertEquals(BranchGroup::class.java, groups[0])
+        assertEquals(RegionalBranchGroup::class.java, groups[1])
     }
 
     @Test

@@ -7,15 +7,7 @@
 [![License](https://img.shields.io/github/license/akash-kansara/modak)](LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.akash-kansara/modak-core)](https://search.maven.org/search?q=g:io.github.akash-kansara)
 
-Modak is a companion library to [Jakarta Bean Validation](https://beanvalidation.org/).
-**Bean Validation** defines **constraints** and checks whether your object model is valid.
-**Modak** focuses only on **data correction**: applying annotation-based rules to automatically fix data.
-
-If you are already using Bean Validation (Hibernate Validator, Apache BVal, or any implementation) and need automatic correction/sanitization, Modak integrates seamlessly as a drop-in companion.
-
-It can also be used standalone, without Bean Validation, whenever you need annotation-driven data correction.
-
-Main features:
+Modak is a library that helps you define data correction rules and provides APIs to correct data in your objects based on those rules. Main features:
 
 1. Lets you express data correction rules on object models via annotations
 2. Lets you write custom constraint in an extensible way
@@ -28,14 +20,11 @@ Main features:
 
 ## 📦 Installation
 
+Available on [Maven Central](https://central.sonatype.com/artifact/io.github.akash-kansara/modak-core?smo=true)
+
 ### Gradle (Kotlin DSL)
 ```kotlin
 dependencies {
-    // Add only if you're not using bean validation already
-    implementation("jakarta.validation:jakarta.validation-api:3.1.0")
-
-    // Modak dependencies
-    implementation("io.github.akash-kansara:modak-api:$version")
     implementation("io.github.akash-kansara:modak-core:$version")
 }
 ```
@@ -43,30 +32,12 @@ dependencies {
 ### Gradle (Groovy DSL)
 ```groovy
 dependencies {
-    // Add only if you're not using bean validation already
-    implementation("jakarta.validation:jakarta.validation-api:3.1.0")
-
-    // Modak dependencies
-    implementation 'io.github.akash-kansara:modak-api:$version'
     implementation 'io.github.akash-kansara:modak-core:$version'
 }
 ```
 
 ### Maven
 ```xml
-<!-- Add only if you're not using bean validation already -->
-<dependency>
-    <groupId>jakarta.validation</groupId>
-    <artifactId>jakarta.validation-api</artifactId>
-    <version>3.1.0</version>
-</dependency>
-
-<!-- Modak dependencies -->
-<dependency>
-    <groupId>io.github.akash-kansara</groupId>
-    <artifactId>modak-api</artifactId>
-    <version>VERSION</version>
-</dependency>
 <dependency>
     <groupId>io.github.akash-kansara</groupId>
     <artifactId>modak-core</artifactId>
@@ -79,7 +50,7 @@ dependencies {
 ### 1. Define your corrections
 
 ```java
-// Annotation:
+// Correction annotation:
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Correction(correctedBy = {UserCorrectionApplier.class})
@@ -118,20 +89,16 @@ public class UserCorrectionApplier implements CorrectionApplier<UserCorrection, 
 ### 2. Define your model with corrections
 
 ```java
-@UserCorrection(
+@UserCorrection(                                // Your custom correction rule
         defaultRole = "DEFAULT",
         adminRole = "ADMIN"
 )
 public class User {
     @Trim                                       // Provided by library
     @DefaultValue(strValue = "Anonymous")       // If you're using getter/setter, you can annotate the getter instead of fields
-    public String name;
+    public String name;                         // public modifier is required
 
-    @NotNull
-    @DefaultValue(                              // Provided by library
-            intValue = 18,
-            constraintFilter = {NotNull.class}
-    )
+    @DefaultValue(intValue = 18)                // Provided by library
     public Integer age;
 
     public String role;
@@ -161,24 +128,63 @@ User user = new User(null, null, null, "example@com!pany.com");
 CorrectionResult<User, ErrorLike> result = corrector.correct(user);
 
 System.out.println(result.isSuccess());         // true
+CorrectionResult.Success<User> successResult = (CorrectionResult.Success<User>) result;
+System.out.println(                             // 4
+        successResult.getAppliedCorrections().size()
+);
+System.out.println(user);                       // User{name='Anonymous', age=18, role='ADMIN', email='example@company.com'}
 
-if (result instanceof CorrectionResult.Success<User, ErrorLike> success) {
-        System.out.println(                     // 4
-            success.getAppliedCorrections().size()
-        );
-        System.out.println(user);               // User{name='Anonymous', age=18, role='ADMIN', email='example@company.com'}
+```
+
+## 🔗 Synergy with Bean Validation
+
+Modak is a companion library to [Jakarta Bean Validation](https://beanvalidation.org/). Its scope is limited to data correction and does not provide data validation features, but it seamlessly integrates with bean validation.
+You can use any bean validation such as [Hibernate Validator](https://hibernate.org/validator/), [Apache BVal](https://bval.apache.org/) along with Modak.
+
+### Bean Validation Example
+
+```java
+public class User {
+    private String name;
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    @NotNull                                    // Jakarta Bean Validation constraint
+    @DefaultValue(
+            strValue = "Anonymous",
+            constraintFilter = {NotNull.class}  // Only apply if NotNull constraint fails
+    )
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
+
+User user = new User(null);
+Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+Set<ConstraintViolation<User>> violations = validator.validate(user);
+Corrector corrector = CorrectorFactory.buildCorrector();
+CorrectionResult<User, ErrorLike> result = corrector.correct(   // Since violations are supplied, correction will be applied only if NotNull constraint has failed
+        user,
+        violations
+);
+System.out.println(user.getName());                             // Anonymous
 ```
 
 ## 📚 Documentation
 
-**📖 [Full Documentation](docs/API.md)**
+**📖 [Full Documentation](docs/REFERENCE_GUIDE.md)**
 
 ## ✨ Key Features
 
-🔧 **Automatic Data Correction** - Fix data issues
+🔧 **Automatic Data Correction** - Automatically fix inconsistent or invalid data
 
-📝 **Annotation-Based** - Simple annotations to define correction rules
+📝 **Annotation-Based** - Use simple, declarative annotations to define correction rules
 
 🔗 **Jakarta Validation Integration** - Works with existing validation constraints
 
@@ -204,4 +210,4 @@ Licensed under the terms in the [LICENSE](LICENSE) file.
 
 ---
 
-**Need help?** [Open an issue](https://github.com/akash-kansara/modak/issues) or check the [full documentation](docs/API.md).
+**Need help?** [Open an issue](https://github.com/akash-kansara/modak/issues) or check the [full documentation](docs/REFERENCE_GUIDE.md).
