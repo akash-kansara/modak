@@ -176,7 +176,7 @@ System.out.println(user.getName());                             // Anonymous
 
 ## 📚 Documentation
 
-**📖 [Full Documentation](docs/API.md)**
+**📖 [Full Documentation](docs/REFERENCE_GUIDE.md)**
 
 ## ✨ Key Features
 
@@ -208,4 +208,4 @@ Licensed under the terms in the [LICENSE](LICENSE) file.
 
 ---
 
-**Need help?** [Open an issue](https://github.com/akash-kansara/modak/issues) or check the [full documentation](docs/API.md).
+**Need help?** [Open an issue](https://github.com/akash-kansara/modak/issues) or check the [full documentation](docs/REFERENCE_GUIDE.md).
