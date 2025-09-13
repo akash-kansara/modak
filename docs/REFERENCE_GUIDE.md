@@ -22,7 +22,7 @@
 
 ## 1. Introduction
 
-The library provides a framework for automatically correcting data validation issues using annotation-based corrections.
+The library provides a framework for automatically correcting inconsistent or invalid data using annotation-based correction rules. It does not perform validation itself, but can complement Bean Validation to correct data when constraints fail.
 
 The primary goals of this specification are:
 
@@ -56,6 +56,7 @@ Add the library dependency to your project:
     <groupId>io.github.akash-kansara</groupId>
     <artifactId>modak-core</artifactId>
     <version>VERSION</version>
+</dependency>
 ```
 
 ***Gradle (Kotlin DSL):***
@@ -224,7 +225,7 @@ public class Company {
     public String name;
 
     @CorrectNested
-    public Office headquarters;
+    public Headquarters headquarters;
 }
 
 // Correction:
@@ -378,8 +379,7 @@ CorrectionResult.Success<User> result = (CorrectionResult.Success<User>) correct
 System.out.println(result.getAppliedCorrections().size());  // 4
 ```
 
-The reason why no corrections were applied when groups weren't specified in the 1st `correct` call is because all corrections have been assigned to specific groups.
-When corrections are not assigned any group _OR_ they are assigned the `DefaultGroup` group, they are applied when no groups are passed in the `correct` call.
+If all corrections are explicitly assigned to groups, calling `correct()` without specifying groups applies none of them. To get corrections by default, either omit the `groups` parameter in annotations, or use `DefaultGroup`.
 
 #### 4.2 Group inheritance
 
@@ -405,6 +405,8 @@ You might have a requirement to apply corrections in a specific order. For examp
 To enforce this, you can use `GroupSequence` annotation.
 
 ```java
+import io.github.akashkansara.modak.api.GroupSequence;
+
 public interface BasicCorrection {
 }
 
@@ -475,7 +477,7 @@ public class PhoneCorrectionApplier implements CorrectionApplier<PhoneCorrection
     }
 
     @Override
-    public PhoneCorrectionApplier<Phone> correct(Phone phone, CorrectionApplierContext context) {
+    public CorrectionApplierResult<Phone> correct(Phone phone, CorrectionApplierContext context) {
         if (phone.countryCode == null) {
             Phone newPhone = new Phone(this.defaultCountryCode, phone.number);
             return new CorrectionApplierResult.Edited<>(phone, newPhone);
@@ -503,7 +505,7 @@ public class User {
 User user = new User("John Doe", new Phone(null, "555-123-4567"));
 CorrectionResult.Success<User> result = (CorrectionResult.Success<User>) corrector.correct(user);
 System.out.println(user);                   // User{name='John Doe', phone=Phone{countryCode='+1', number='555-123-4567'}}
-System.out.println(                         // Phone{countryCode='null', number='555-123-4567'}
+System.out.println(                         // Phone{countryCode=null, number='555-123-4567'}
         successResult.getAppliedCorrections().get(0).getOldValue()
 );
 System.out.println(                         // Phone{countryCode='+1', number='555-123-4567'}
@@ -550,7 +552,8 @@ public class User {
 
 ### 6. Integrating with Jakarta Bean Validation
 
-The library can be integrated with Jakarta Bean Validation seamlessly. The integration feature allows you to pass in constraint violations to the `correct` method, and it will only apply corrections that are relevant to those violations.
+The library can optionally integrate with Jakarta Bean Validation. When integrated, you can pass constraint violations to correct(), and Modak will apply only corrections relevant to those violations.
+
 You can additionally supply groups as well to further control sequence of corrections as discussed above.
 
 ```java
