@@ -55,51 +55,97 @@ This library is inspired by and designed to complement [Jakarta Bean Validation]
 
 ---
 
-## 2. Correction definition
+## 2. Getting Started
 
-### 2.1. Correction annotation
+### 2.1. Setup project
 
-A correction is defined by annotating an annotation with `@Correction` and specifying the correction applier classes that implement the correction logic.
-
-```kotlin
-@Target(AnnotationTarget.ANNOTATION_CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class Correction(
-    val correctedBy: Array<KClass<out CorrectionApplier<*, *>>>
-)
+Add the library dependency to your project:
+**Maven:**
+```xml
+<dependency>
+    <groupId>io.github.akash-kansara</groupId>
+    <artifactId>modak-core</artifactId>
+    <version>VERSION</version>
 ```
 
-#### 2.1.1. Correction definition properties
-
-Every correction annotation must include the following properties:
-
+***Gradle (Kotlin DSL):***
 ```kotlin
-val groups: Array<KClass<*>> = []
-val payload: Array<KClass<*>> = []
-val constraintFilter: Array<KClass<*>> = []
-val correctionTarget: CorrectionTarget = CorrectionTarget.PROPERTY
+dependencies {
+    implementation("io.github.akash-kansara:modak-core:$VERSION")
+}
 ```
 
-- **groups**: Specifies the validation groups for which this correction applies
-- **payload**: Allows attaching metadata to the correction
-- **constraintFilter**: Specifies which constraint violations trigger this correction
-- **correctionTarget**: Defines what should be corrected - property value or container elements. When not supplied, correction is targeted to properties.
+#### 2.2 Defining corrections
 
-#### 2.1.2. Examples
+Example: Class User with corrections
 
-```kotlin
-@Target(AnnotationTarget.FIELD, AnnotationTarget.TYPE)
-@Correction(correctedBy = [StringDefaultValueCorrectionApplier::class])
-annotation class DefaultValue(
-    val groups: Array<KClass<*>> = [],
-    val payload: Array<KClass<*>> = [],
-    val constraintFilter: Array<KClass<*>> = [],
-    val correctionTarget: CorrectionTarget = CorrectionTarget.PROPERTY,
-    val strValue: String = "",
-    val intValue: Int = 0,
-    // ... other value types
-)
+```java
+import io.github.akashkansara.modak.api.correction.DefaultValue;
+import io.github.akashkansara.modak.api.correction.RegexReplace;
+import io.github.akashkansara.modak.api.correction.Trim;
+
+public class User {
+  @Trim
+  @DefaultValue(strValue = "Anonymous")
+  public String name;
+
+  @DefaultValue(intValue = 18)
+  public Integer age;
+
+  public String role;
+
+  @RegexReplace(
+          regexPattern = "[^a-zA-Z0-9@._-]",
+          replaceStr = ""
+  )
+  public String email;
+
+  public User(String name, Integer age, String role, String email) {
+    this.name = name;
+    this.age = age;
+    this.role = role;
+    this.email = email;
+  }
+}
 ```
+
+_NOTE: If you're using getter/setter methods, you can annotate the getter instead of fields_
+
+The `@Trim`, `@DefaultValue` and `@RegexReplace` annotations are used to declare the corrections which should be applied to the fields of a User instance:
+
+- If `name` is null, assign a default value of "Anonymous"
+- Trim leading and trailing whitespace from `name`
+- If `age` is null, assign a default value of 18
+- Replace any characters from `email` that match the specified regex pattern
+
+#### 2.3 Applying corrections
+
+```java
+import io.github.akashkansara.modak.api.CorrectionResult;
+import io.github.akashkansara.modak.api.Corrector;
+import io.github.akashkansara.modak.core.CorrectorFactory;
+
+public class Main {
+    public static void main(String[] args) {
+    Corrector corrector = CorrectorFactory.buildCorrector();
+    User user = new User("  John Doe  ", null, null, "example@com!pany.com");
+    var result = corrector.correct(user);
+        if (result.isSuccess()) {
+            CorrectionResult.Success<User> successResult = (CorrectionResult.Success<User>) result;
+            System.out.println(successResult.getAppliedCorrections().size());
+            System.out.println(user); // User{name='John Doe', age=18, role=null, email='example@company.com'}
+        } else {
+            CorrectionResult.Failure failure = ((CorrectionResult.Failure) result);
+            System.out.println(failure.getError().getMessage());
+            System.out.println(failure.getError().getCause());
+            System.out.println(failure.getError().getAppliedCorrections());
+        }
+    }
+}
+```
+
+The `correct()` method returns `CorrectionResult` which has a property `isSuccess` that indicates whether correction was successful.
+When `isSuccess` is `true`, you can safely cast the result to  which you can iterate over in order to see which validation errors occurred.
 
 ### 2.2. Correction composition
 

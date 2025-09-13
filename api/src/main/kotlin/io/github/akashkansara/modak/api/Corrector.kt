@@ -16,7 +16,7 @@ interface Corrector {
     fun <T> correct(
         obj: T,
         vararg groups: Class<*>,
-    ): CorrectionResult<T, ErrorLike>
+    ): CorrectionResult<T>
 
     /**
      * Applies corrections to the given object, considering existing constraint violations.
@@ -30,5 +30,5 @@ interface Corrector {
         obj: T,
         constraintViolations: Set<ConstraintViolation<T>>,
         vararg groups: Class<*>,
-    ): CorrectionResult<T, ErrorLike>
+    ): CorrectionResult<T>
 }

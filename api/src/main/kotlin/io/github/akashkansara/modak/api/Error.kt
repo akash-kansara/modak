@@ -3,7 +3,7 @@ package io.github.akashkansara.modak.api
 /**
  * Represents an error that occurred during correction operations.
  */
-interface ErrorLike {
+interface Error {
     /** Error message describing what went wrong */
     val message: String
 

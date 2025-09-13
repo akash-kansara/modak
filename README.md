@@ -23,11 +23,6 @@ Modak is a library to that helps you define data correction rules and provides A
 ### Gradle (Kotlin DSL)
 ```kotlin
 dependencies {
-    // Add only if you're not using bean validation already
-    implementation("jakarta.validation:jakarta.validation-api:3.1.0")
-
-    // Modak dependencies
-    implementation("io.github.akash-kansara:modak-api:$version")
     implementation("io.github.akash-kansara:modak-core:$version")
 }
 ```
@@ -35,30 +30,12 @@ dependencies {
 ### Gradle (Groovy DSL)
 ```groovy
 dependencies {
-    // Add only if you're not using bean validation already
-    implementation("jakarta.validation:jakarta.validation-api:3.1.0")
-
-    // Modak dependencies
-    implementation 'io.github.akash-kansara:modak-api:$version'
     implementation 'io.github.akash-kansara:modak-core:$version'
 }
 ```
 
 ### Maven
 ```xml
-<!-- Add only if you're not using bean validation already -->
-<dependency>
-    <groupId>jakarta.validation</groupId>
-    <artifactId>jakarta.validation-api</artifactId>
-    <version>3.1.0</version>
-</dependency>
-
-<!-- Modak dependencies -->
-<dependency>
-    <groupId>io.github.akash-kansara</groupId>
-    <artifactId>modak-api</artifactId>
-    <version>VERSION</version>
-</dependency>
 <dependency>
     <groupId>io.github.akash-kansara</groupId>
     <artifactId>modak-core</artifactId>
@@ -71,7 +48,7 @@ dependencies {
 ### 1. Define your corrections
 
 ```java
-// Annotation:
+// Correction annotation:
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Correction(correctedBy = {UserCorrectionApplier.class})
@@ -149,13 +126,12 @@ User user = new User(null, null, null, "example@com!pany.com");
 CorrectionResult<User, ErrorLike> result = corrector.correct(user);
 
 System.out.println(result.isSuccess());         // true
+CorrectionResult.Success<User> successResult = (CorrectionResult.Success<User>) result;
+System.out.println(                             // 4
+        success.getAppliedCorrections().size()
+);
+System.out.println(user);                       // User{name='Anonymous', age=18, role='ADMIN', email='example@company.com'}
 
-if (result instanceof CorrectionResult.Success<User, ErrorLike> success) {
-        System.out.println(                     // 4
-            success.getAppliedCorrections().size()
-        );
-        System.out.println(user);               // User{name='Anonymous', age=18, role='ADMIN', email='example@company.com'}
-}
 ```
 
 ## 🔗 Synergy with Bean Validation
