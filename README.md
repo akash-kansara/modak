@@ -191,7 +191,7 @@ User user = new User(null);
 Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 Set<ConstraintViolation<User>> violations = validator.validate(user);
 Corrector corrector = CorrectorFactory.buildCorrector();
-CorrectionResult<User, ErrorLike> result = corrector.correct(   // Since violations are passed, correction will be applied only if NotNull constraint has failed
+CorrectionResult<User, ErrorLike> result = corrector.correct(   // Since violations are supplied, correction will be applied only if NotNull constraint has failed
         user,
         violations
 );
