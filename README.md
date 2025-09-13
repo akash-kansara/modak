@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/github/license/akash-kansara/modak)](LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.akash-kansara/modak-core)](https://search.maven.org/search?q=g:io.github.akash-kansara)
 
-Modak is a library to that helps you define data correction rules and provides APIs to correct data in your objects based on those rules. Main features:
+Modak is a library that helps you define data correction rules and provides APIs to correct data in your objects based on those rules. Main features:
 
 1. Lets you express data correction rules on object models via annotations
 2. Lets you write custom constraint in an extensible way
@@ -19,6 +19,8 @@ Modak is a library to that helps you define data correction rules and provides A
 **Modak** is a traditional Indian sweet, typically a dumpling, made with rice or wheat flour and filled with a sweet mixture, often grated coconut and jaggery.
 
 ## 📦 Installation
+
+Available on [Maven Central](https://central.sonatype.com/artifact/io.github.akash-kansara/modak-core?smo=true)
 
 ### Gradle (Kotlin DSL)
 ```kotlin
@@ -128,7 +130,7 @@ CorrectionResult<User, ErrorLike> result = corrector.correct(user);
 System.out.println(result.isSuccess());         // true
 CorrectionResult.Success<User> successResult = (CorrectionResult.Success<User>) result;
 System.out.println(                             // 4
-        success.getAppliedCorrections().size()
+        successResult.getAppliedCorrections().size()
 );
 System.out.println(user);                       // User{name='Anonymous', age=18, role='ADMIN', email='example@company.com'}
 
@@ -180,9 +182,9 @@ System.out.println(user.getName());                             // Anonymous
 
 ## ✨ Key Features
 
-🔧 **Automatic Data Correction** - Fix data issues
+🔧 **Automatic Data Correction** - Automatically fix inconsistent or invalid data
 
-📝 **Annotation-Based** - Simple annotations to define correction rules
+📝 **Annotation-Based** - Use simple, declarative annotations to define correction rules
 
 🔗 **Jakarta Validation Integration** - Works with existing validation constraints
 
