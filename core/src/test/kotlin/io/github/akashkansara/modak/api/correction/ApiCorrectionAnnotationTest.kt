@@ -14,15 +14,15 @@ class ApiCorrectionAnnotationTest {
 
         @field:RegexReplace(
             regexPattern = "\\(",
-            replaceStr = ""
+            replaceStr = "",
         )
         @field:RegexReplace(
             regexPattern = "\\)",
-            replaceStr = ""
+            replaceStr = "",
         )
         @field:RegexReplace(
             regexPattern = "-",
-            replaceStr = ""
+            replaceStr = "",
         )
         @field:Trim
         val phoneNumber: String,
