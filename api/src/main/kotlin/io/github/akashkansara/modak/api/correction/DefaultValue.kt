@@ -23,6 +23,15 @@ import kotlin.reflect.KClass
  * @param enumValueClass Enum class for default enum value
  * @param enumValueName Name of the default enum value
  */
+@Repeatable
+@Retention(AnnotationRetention.RUNTIME)
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER,
+    AnnotationTarget.FUNCTION,
+)
 @Correction(correctedBy = [])
 annotation class DefaultValue(
     val groups: Array<KClass<*>> = [],
@@ -40,4 +49,16 @@ annotation class DefaultValue(
     val shortValue: Short = 0,
     val enumValueClass: KClass<out Enum<*>> = Nothing::class,
     val enumValueName: String = "",
-)
+) {
+    @Retention(AnnotationRetention.RUNTIME)
+    @Target(
+        AnnotationTarget.FIELD,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.PROPERTY_GETTER,
+        AnnotationTarget.PROPERTY_SETTER,
+        AnnotationTarget.FUNCTION,
+    )
+    annotation class List(
+        val value: Array<DefaultValue>,
+    )
+}

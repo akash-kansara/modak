@@ -14,6 +14,15 @@ import kotlin.reflect.KClass
  * @param regexPattern The regex pattern to match against the string
  * @param replaceStr The string to replace the matched pattern with
  */
+@Repeatable
+@Retention(AnnotationRetention.RUNTIME)
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER,
+    AnnotationTarget.FUNCTION,
+)
 @Correction(correctedBy = [])
 annotation class RegexReplace(
     val groups: Array<KClass<*>> = [],
@@ -28,4 +37,16 @@ annotation class RegexReplace(
      * The string to replace the matched pattern with
      */
     val replaceStr: String,
-)
+) {
+    @Retention(AnnotationRetention.RUNTIME)
+    @Target(
+        AnnotationTarget.FIELD,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.PROPERTY_GETTER,
+        AnnotationTarget.PROPERTY_SETTER,
+        AnnotationTarget.FUNCTION,
+    )
+    annotation class List(
+        val value: Array<RegexReplace>,
+    )
+}
