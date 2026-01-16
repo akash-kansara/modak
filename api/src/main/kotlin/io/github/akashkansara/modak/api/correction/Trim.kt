@@ -12,10 +12,31 @@ import kotlin.reflect.KClass
  * @param constraintFilter Constraint types that trigger this correction
  * @param correctionTarget What should be corrected (property or container elements)
  */
+@Repeatable
+@Retention(AnnotationRetention.RUNTIME)
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER,
+    AnnotationTarget.FUNCTION,
+)
 @Correction(correctedBy = [])
 annotation class Trim(
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<*>> = [],
     val constraintFilter: Array<KClass<*>> = [],
     val correctionTarget: CorrectionTarget = CorrectionTarget.PROPERTY,
-)
+) {
+    @Retention(AnnotationRetention.RUNTIME)
+    @Target(
+        AnnotationTarget.FIELD,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.PROPERTY_GETTER,
+        AnnotationTarget.PROPERTY_SETTER,
+        AnnotationTarget.FUNCTION,
+    )
+    annotation class List(
+        val value: Array<Trim>,
+    )
+}

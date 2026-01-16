@@ -38,7 +38,7 @@ class AnnotationBeanInspector : BeanInspector {
                 val superBean = buildBeanMetaData(clazz.superclass, processing).bind()
                 beanBuilder.addPropertyMetaData(superBean.properties)
             }
-            beanBuilder.addBeanCorrectionMeta(getmodakAnnotations(clazz).bind())
+            beanBuilder.addBeanCorrectionMeta(getModakAnnotations(clazz).bind())
             processing.remove(clazz)
             beanBuilder.toReflectedBean()
         }
@@ -131,21 +131,21 @@ class AnnotationBeanInspector : BeanInspector {
             val annotations = mutableListOf<CorrectionMeta>()
             val modifiers = mutableSetOf<Annotation>()
             property.readMethod?.let {
-                annotations.addAll(getmodakAnnotations(property.readMethod).bind())
+                annotations.addAll(getModakAnnotations(property.readMethod).bind())
                 modifiers.addAll(getCorrectionModifiers(it))
             }
             property.writeMethod?.let {
-                annotations.addAll(getmodakAnnotations(property.writeMethod).bind())
+                annotations.addAll(getModakAnnotations(property.writeMethod).bind())
                 modifiers.addAll(getCorrectionModifiers(it))
             }
             property.field?.let {
-                annotations.addAll(getmodakAnnotations(property.field).bind())
+                annotations.addAll(getModakAnnotations(property.field).bind())
                 modifiers.addAll(getCorrectionModifiers(it))
             }
             PropertyMetaData(
                 name = property.name,
                 genericType = property.genericType,
-                correctionMetas = annotations.distinctBy { it.annotation.annotationClass },
+                correctionMetas = annotations,
                 correctionModifiers = modifiers.toSet(),
                 readMethod = property.readMethod,
                 writeMethod = property.writeMethod,
@@ -195,9 +195,14 @@ class AnnotationBeanInspector : BeanInspector {
         },
     )
 
-    private fun getmodakAnnotations(annotated: AnnotatedElement) = Either.catch {
-        annotated.annotations.mapNotNull {
-            val dcAnnotation = findmodakAnnotation(it)
+    private fun getModakAnnotations(annotated: AnnotatedElement) = Either.catch {
+        val allAnnotations = mutableListOf<Annotation>()
+        annotated.annotations.forEach { annotation ->
+            val unwrappedAnnotations = unwrapRepeatableAnnotations(annotation)
+            allAnnotations.addAll(unwrappedAnnotations)
+        }
+        allAnnotations.mapNotNull {
+            val dcAnnotation = findModakAnnotation(it)
             if (dcAnnotation != null) {
                 CorrectionMeta(
                     annotation = it,
@@ -210,7 +215,7 @@ class AnnotationBeanInspector : BeanInspector {
             } else {
                 null
             }
-        }.distinctBy { it.annotation.annotationClass }
+        }
     }.mapLeft {
         InternalError.BeanInspectionError(
             configurationSource,
@@ -219,7 +224,26 @@ class AnnotationBeanInspector : BeanInspector {
         )
     }
 
-    private fun findmodakAnnotation(annotation: Annotation) =
+    private fun unwrapRepeatableAnnotations(annotation: Annotation): List<Annotation> {
+        try {
+            val annotationClass = annotation.annotationClass.java
+            val valueMethod = annotationClass.getMethod("value")
+            val returnType = valueMethod.returnType
+            if (!returnType.isArray) {
+                return listOf(annotation)
+            }
+            val containerValue = valueMethod.invoke(annotation) as? Array<*>
+            val unwrapped = containerValue?.filterIsInstance<Annotation>() ?: emptyList()
+            if (unwrapped.isNotEmpty()) {
+                return unwrapped
+            }
+            return listOf(annotation)
+        } catch (_: Throwable) {
+            return listOf(annotation)
+        }
+    }
+
+    private fun findModakAnnotation(annotation: Annotation) =
         annotation.annotationClass.java.annotations.firstOrNull { x -> x.annotationClass.java == Correction::class.java }
 
     private fun getGenericType(

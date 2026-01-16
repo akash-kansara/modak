@@ -14,6 +14,15 @@ import kotlin.reflect.KClass
  * @param length The maximum allowed length for the field value
  * @param fromEnd Whether to truncate from the start or the end of the string, defaults to `true`
  */
+@Repeatable
+@Retention(AnnotationRetention.RUNTIME)
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER,
+    AnnotationTarget.FUNCTION,
+)
 @Correction(correctedBy = [])
 annotation class Truncate(
     val groups: Array<KClass<*>> = [],
@@ -32,4 +41,16 @@ annotation class Truncate(
      * Defaults to true
      */
     val fromEnd: Boolean = true,
-)
+) {
+    @Retention(AnnotationRetention.RUNTIME)
+    @Target(
+        AnnotationTarget.FIELD,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.PROPERTY_GETTER,
+        AnnotationTarget.PROPERTY_SETTER,
+        AnnotationTarget.FUNCTION,
+    )
+    annotation class List(
+        val value: Array<Truncate>,
+    )
+}
